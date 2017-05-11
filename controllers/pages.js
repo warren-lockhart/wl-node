@@ -8,8 +8,6 @@ module.exports.page = function(req, res)
     var url = 'mongodb://localhost:27017/wlnet';
 
     // Connect to the database using this client.
-    // TODO: db.close()
-    // TODO: db and collection names in config file
     // TODO: HTTP status codes.
     mongoClient.connect(url).then(function (db) {
 
@@ -39,6 +37,8 @@ module.exports.page = function(req, res)
                 summary: document.summary,
                 content: document.content
             };
+
+            db.close();
 
             // Render the view model into the index view.
             res.render('index', viewModel);
