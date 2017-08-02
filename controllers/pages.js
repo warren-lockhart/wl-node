@@ -1,11 +1,14 @@
-module.exports.page = function(req, res)
-{
-    var page = req.params.page;
+const monthNames = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
 
-    var mongoClient = require('mongodb').MongoClient;
+module.exports.page = function(req, res) {
+    const page = req.params.page;
+
+    const mongoClient = require('mongodb').MongoClient;
 
     // The database is called wlnet, the collection is called pages.
-    var url = 'mongodb://localhost:27017/wlnet';
+    const url = 'mongodb://localhost:27017/wlnet';
 
     // Connect to the database using this client.
     // TODO: HTTP status codes.
@@ -15,6 +18,7 @@ module.exports.page = function(req, res)
 
             if (!docs.length)
             {
+                // TODO: return 404 view.
                 throw new Error("No documents were returned for page identifier " + page);
             }
 
@@ -24,7 +28,7 @@ module.exports.page = function(req, res)
             }
 
             // The single record is the page document.
-            var document = docs[0];
+            const document = docs[0];
 
             if (!document)
             {
@@ -32,22 +36,57 @@ module.exports.page = function(req, res)
             }
 
             // Construct the view model from the document.
-            var viewModel = {
+            const viewModel = {
                 title: document.title,
                 summary: document.summary,
-                content: document.content
+                content: document.content,
+                date: document.date
             };
 
             db.close();
 
             // Render the view model into the index view.
-            res.render('index', viewModel);
+            return res.render('index', viewModel);
+
         }).catch(function (err) {
             // Throw any errors back up the promise chain so that the outer catch can handle them.
             throw(err);
         });
     }).catch(function (err) {
         console.error(err.message, err.stack);
-        res.render('error', {status: err.status, error: err});
+        return res.render('error', {status: err.status, error: err});
     });
 };
+
+module.exports.new = function(req, res) {
+    res.render('new');
+}
+
+module.exports.create = function(req, res) {
+
+    if (!req.body.page || !req.body.title)
+    {
+        // Send the existing form values and a message to the view.
+        const viewModel = {
+            message: "The page and title fields must be populated to create a new page",
+            page: req.body.page,
+            title: req.body.title,
+            summary: req.body.summary,
+            content: req.body.content
+        };
+
+        return res.render('new', viewModel);
+    }
+
+    const dateNow = new Date();
+
+    const viewModel = {
+        page: req.body.page,
+        title: req.body.title,
+        year: dateNow.getFullYear(),
+        month: monthNames[dateNow.getMonth()],
+        day: dateNow.getDate()
+    };
+
+    return res.render('created', viewModel);
+}

@@ -1,0 +1,15 @@
+<h1>Create a new page</h1>
+
+<h2>{{message}}</h2>
+
+<form method='post'>
+    <label>Choose an identifier for the new page in the database (a unique string)
+    <input name='page' value='{{page}}'/>
+    <label>Enter the title of the new page</label>
+    <input name='title' value='{{title}}'/>
+    <label>Enter the summary text</label>
+    <textarea name='summary' >{{summary}}</textarea>
+    <label>Enter the main page content</label>
+    <textarea name='content' >{{content}}</textarea>
+    <input type='submit' value='Create page'>
+</form>
